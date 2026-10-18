@@ -129,3 +129,4 @@ input:focus, select:focus { outline: 2px solid var(--accent); }
 @keyframes up { from { transform: translateY(40px); opacity: 0; } }
 @keyframes fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+.status-line { font-weight: 600; margin: 6px 0 0; }

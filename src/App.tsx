@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { startAutoBackup } from './cloud/backup'
 import { useData, useToday } from './data'
 import { Today } from './screens/Today'
 import { NewChallenge } from './screens/NewChallenge'
@@ -34,6 +35,7 @@ export default function App() {
     setTimeout(() => setToast((cur) => (cur?.key === key ? null : cur)), 4000)
   }, [])
   const celebrate = useCallback((big = false) => setBurst((b) => ({ n: b.n + 1, big })), [])
+  useEffect(() => startAutoBackup((text) => showToast({ text })), [showToast])
   const ctx: Ctx = { today, go: setView, toast: showToast, celebrate }
 
   const tab = view.name === 'detail' || view.name === 'new' ? null : view.name
