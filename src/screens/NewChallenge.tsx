@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import type { Ctx } from '../App'
-import type { Kind } from '../domain/types'
-import { addChallenge } from '../db/repo'
+import type { Challenge, Kind } from '../domain/types'
+import { addChallenge, updateChallenge } from '../db/repo'
 import { COLORS, EMOJIS, TEMPLATES, type Template, durationLabel, periodLabel } from '../templates'
 import { takePending } from './nav'
 
 const PERIODS = [1, 2, 7]
 const DURATIONS = [7, 14, 30]
 
-export function NewChallenge({ ctx }: { ctx: Ctx }) {
-  const [t] = useState<Template | null>(takePending)
+export function NewChallenge({ ctx, challenge }: { ctx: Ctx; challenge?: Challenge }) {
+  const [t] = useState<Template | Challenge | null>(() => challenge ?? takePending())
   const [title, setTitle] = useState(t?.title ?? '')
   const [emoji, setEmoji] = useState(t?.emoji ?? EMOJIS[0])
   const [color, setColor] = useState(t?.color ?? COLORS[0])
@@ -20,7 +20,7 @@ export function NewChallenge({ ctx }: { ctx: Ctx }) {
   const [customPeriod, setCustomPeriod] = useState(false)
   const [duration, setDuration] = useState(String(t?.durationDays ?? 30))
   const [durUnit, setDurUnit] = useState<'days' | 'weeks'>('days')
-  const [reminder, setReminder] = useState('')
+  const [reminder, setReminder] = useState(challenge?.reminderTime ?? '')
 
   const apply = (x: Template) => {
     setTitle(x.title)
@@ -41,6 +41,21 @@ export function NewChallenge({ ctx }: { ctx: Ctx }) {
 
   async function save() {
     if (!valid) return
+    if (challenge) {
+      await updateChallenge(challenge.id, {
+        title: title.trim(),
+        emoji,
+        color,
+        kind,
+        target: kind === 'check' ? 1 : targetN,
+        unit: kind === 'check' ? '' : unit.trim(),
+        periodDays: period,
+        durationDays,
+        reminderTime: reminder || undefined,
+      })
+      ctx.go({ name: 'detail', id: challenge.id })
+      return
+    }
     const id = await addChallenge({
       title: title.trim(),
       emoji,
@@ -59,20 +74,22 @@ export function NewChallenge({ ctx }: { ctx: Ctx }) {
   return (
     <div className="screen">
       <header className="row">
-        <button className="link" onClick={() => ctx.go({ name: 'today' })}>
+        <button className="link" onClick={() => ctx.go(challenge ? { name: 'detail', id: challenge.id } : { name: 'today' })}>
           Cancel
         </button>
-        <h1 className="small">New challenge</h1>
+        <h1 className="small">{challenge ? 'Edit challenge' : 'New challenge'}</h1>
         <span style={{ width: 52 }} />
       </header>
 
-      <div className="chips scroll">
-        {TEMPLATES.map((x) => (
-          <button key={x.label} className="chip" onClick={() => apply(x)}>
-            {x.label}
-          </button>
-        ))}
-      </div>
+      {!challenge && (
+        <div className="chips scroll">
+          {TEMPLATES.map((x) => (
+            <button key={x.label} className="chip" onClick={() => apply(x)}>
+              {x.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="field">
         <label>Name</label>
@@ -169,7 +186,7 @@ export function NewChallenge({ ctx }: { ctx: Ctx }) {
       </div>
 
       <button className="primary" style={{ background: color }} disabled={!valid} onClick={save}>
-        Start challenge
+        {challenge ? 'Save changes' : 'Start challenge'}
       </button>
     </div>
   )

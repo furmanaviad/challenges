@@ -34,7 +34,9 @@ export function Detail({ ctx, data, id }: { ctx: Ctx; data: ReturnType<typeof us
         <button className="link" onClick={() => ctx.go({ name: c.archivedAt ? 'archive' : 'today' })}>
           ‹ Back
         </button>
-        <span />
+        <button className="link" onClick={() => ctx.go({ name: 'edit', id: c.id })}>
+          Edit
+        </button>
       </header>
 
       <div className="hero">

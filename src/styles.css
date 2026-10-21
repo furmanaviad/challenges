@@ -36,8 +36,7 @@ header.row { display: flex; align-items: center; justify-content: space-between;
 .card-body b { font-size: 18px; letter-spacing: -.01em; }
 .meta { font-size: 15px; font-variant-numeric: tabular-nums; }
 .meta.dim { color: var(--dim); font-size: 13px; }
-.plus { width: 34px; height: 34px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font-size: 22px; font-weight: 500; }
-.ring-btn { display: block; border-radius: 50%; }
+.more { width: 38px; height: 38px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font-size: 22px; font-weight: 700; line-height: 1; padding-bottom: 6px; text-align: center; flex: none; }
 .ring { position: relative; flex: none; }
 .ring-inner { position: absolute; inset: 0; display: grid; place-items: center; }
 .emoji { font-size: 30px; } .emoji.sm { font-size: 24px; }

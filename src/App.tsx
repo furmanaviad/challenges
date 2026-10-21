@@ -8,7 +8,7 @@ import { Archive } from './screens/Archive'
 import { Settings } from './screens/Settings'
 import { Confetti } from './components/Confetti'
 
-export type View = { name: 'today' } | { name: 'new' } | { name: 'archive' } | { name: 'settings' } | { name: 'detail'; id: string }
+export type View = { name: 'today' } | { name: 'new' } | { name: 'archive' } | { name: 'settings' } | { name: 'detail'; id: string } | { name: 'edit'; id: string }
 
 export interface Toast {
   text: string
@@ -38,7 +38,7 @@ export default function App() {
   useEffect(() => startAutoBackup((text) => showToast({ text })), [showToast])
   const ctx: Ctx = { today, go: setView, toast: showToast, celebrate }
 
-  const tab = view.name === 'detail' || view.name === 'new' ? null : view.name
+  const tab = view.name === 'detail' || view.name === 'new' || view.name === 'edit' ? null : view.name
 
   return (
     <div className="app">
@@ -47,6 +47,8 @@ export default function App() {
           <Today ctx={ctx} data={data} />
         ) : view.name === 'new' ? (
           <NewChallenge ctx={ctx} />
+        ) : view.name === 'edit' ? (
+          <NewChallenge ctx={ctx} challenge={data.challenges.find((c) => c.id === view.id)} />
         ) : view.name === 'detail' ? (
           <Detail ctx={ctx} data={data} id={view.id} />
         ) : view.name === 'archive' ? (

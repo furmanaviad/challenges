@@ -46,24 +46,26 @@ export function Today({ ctx, data }: { ctx: Ctx; data: Data }) {
   const card = ({ c, s }: (typeof items)[number]) => {
     const pct = s.current.target ? s.current.progress / s.current.target : 0
     const check = c.kind === 'check'
+    const onCard = () => {
+      if (check) {
+        if (!s.current.done) void log(c, 1)
+        else ctx.go({ name: 'detail', id: c.id })
+      } else setLogging(c.id)
+    }
     return (
-      <button key={c.id} className={`card ${s.current.done ? 'is-done' : ''}`} onClick={() => ctx.go({ name: 'detail', id: c.id })} style={{ ['--c' as string]: c.color }}>
-        <span
-          role="button"
-          className="ring-btn"
-          onClick={(e) => {
-            e.stopPropagation()
-            if (check) {
-              if (!s.current.done) void log(c, 1)
-              else ctx.go({ name: 'detail', id: c.id })
-            } else setLogging(c.id)
-          }}
-          aria-label={check ? `Mark ${c.title} done` : `Log ${c.title}`}
-        >
-          <ProgressRing value={pct} color={c.color}>
-            {s.current.done ? <span className="tick">✓</span> : <span className="emoji">{c.emoji}</span>}
-          </ProgressRing>
-        </span>
+      <div
+        key={c.id}
+        role="button"
+        tabIndex={0}
+        className={`card ${s.current.done ? 'is-done' : ''}`}
+        style={{ ['--c' as string]: c.color }}
+        onClick={onCard}
+        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCard()}
+        aria-label={check ? `Mark ${c.title} done` : `Log ${c.title}`}
+      >
+        <ProgressRing value={pct} color={c.color}>
+          {s.current.done ? <span className="tick">✓</span> : <span className="emoji">{c.emoji}</span>}
+        </ProgressRing>
         <span className="card-body">
           <b>{c.title}</b>
           <span className="meta">
@@ -78,8 +80,17 @@ export function Today({ ctx, data }: { ctx: Ctx; data: Data }) {
             {s.streak > 1 ? ` · 🔥 ${s.streak}` : ''}
           </span>
         </span>
-        {!check && !s.current.done && <span className="plus">+</span>}
-      </button>
+        <button
+          className="more"
+          aria-label={`${c.title} details`}
+          onClick={(e) => {
+            e.stopPropagation()
+            ctx.go({ name: 'detail', id: c.id })
+          }}
+        >
+          ⋯
+        </button>
+      </div>
     )
   }
 

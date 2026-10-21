@@ -29,7 +29,7 @@ export function QuickLog({ challenge, progress, target, onClose, onLog }: { chal
           <span> {challenge.unit}</span>
         </div>
         <div className="chips">
-          {chipsFor(target).map((n) => (
+          {[...new Set([0.5, 1, ...chipsFor(target)])].sort((a, b) => a - b).map((n) => (
             <button key={n} className="chip" onClick={() => add(n)}>
               +{fmt(n)}
             </button>
