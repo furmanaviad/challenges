@@ -4,7 +4,7 @@ import type { useData } from '../data'
 import { summarize } from '../domain/stats'
 import { endDate } from '../domain/schedule'
 import { formatShort } from '../domain/dates'
-import { archiveChallenge, deleteChallenge, deleteLog, unarchiveChallenge, updateLog } from '../db/repo'
+import { archiveChallenge, deleteChallenge, deleteLog, restartChallenge, unarchiveChallenge, updateLog } from '../db/repo'
 import { downloadIcs } from '../reminders/ics'
 import { PeriodGrid } from '../components/PeriodGrid'
 import { ProgressRing } from '../components/ProgressRing'
@@ -105,6 +105,20 @@ export function Detail({ ctx, data, id }: { ctx: Ctx; data: ReturnType<typeof us
             🔔 Add {c.reminderTime} reminder to Calendar
           </button>
         )}
+        <button
+          className="secondary"
+          disabled={busy}
+          onClick={async () => {
+            if (s.status !== 'finished' && !window.confirm(`Restart "${c.title}" from today? The current run moves to History.`)) return
+            setBusy(true)
+            const id = await restartChallenge(c, ctx.today)
+            ctx.toast({ text: `🔄 ${c.title} restarted` })
+            ctx.go({ name: 'detail', id })
+            setBusy(false)
+          }}
+        >
+          🔄 Restart challenge
+        </button>
         {c.archivedAt ? (
           <button className="secondary" onClick={() => void unarchiveChallenge(c.id)}>
             Restore to Today

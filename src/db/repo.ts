@@ -23,6 +23,14 @@ export async function addChallenge(input: NewChallenge): Promise<string> {
   return id
 }
 
+/** Starts a fresh run of the same challenge from `today`; the old run moves to History with its results. */
+export async function restartChallenge(c: Challenge, today: DateStr): Promise<string> {
+  const { id: _id, createdAt: _c, archivedAt: _a, ...rest } = c
+  const id = await addChallenge({ ...rest, startDate: today })
+  if (!c.archivedAt) await archiveChallenge(c.id)
+  return id
+}
+
 export const updateChallenge = (id: string, patch: Partial<Challenge>) => db.challenges.update(id, patch).then(tap)
 
 export const archiveChallenge = (id: string) => db.challenges.update(id, { archivedAt: Date.now() }).then(tap)
