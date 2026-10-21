@@ -7,8 +7,13 @@ import type { Challenge, LogEntry } from './domain/types'
 /** Today's date string, refreshed when the app returns to the foreground. */
 export function useToday(): string {
   const [today, setToday] = useState(todayStr())
+  const [, tick] = useState(0)
   useEffect(() => {
-    const refresh = () => setToday(todayStr())
+    // Also re-render so "hours left" labels stay current.
+    const refresh = () => {
+      setToday(todayStr())
+      tick((n) => n + 1)
+    }
     document.addEventListener('visibilitychange', refresh)
     const t = setInterval(refresh, 60_000)
     return () => {

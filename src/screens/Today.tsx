@@ -7,7 +7,7 @@ import { formatShort } from '../domain/dates'
 import { addLog, deleteLog } from '../db/repo'
 import { ProgressRing } from '../components/ProgressRing'
 import { QuickLog } from '../components/QuickLog'
-import { TEMPLATES, fmt, periodLabel } from '../templates'
+import { TEMPLATES, fmt, periodLabel, timeLeftLabel } from '../templates'
 import { goNew } from './nav'
 
 type Data = ReturnType<typeof useData>
@@ -76,7 +76,7 @@ export function Today({ ctx, data }: { ctx: Ctx; data: Data }) {
               : `${fmt(s.current.progress)} / ${fmt(s.current.target)} ${c.unit}`}
           </span>
           <span className="meta dim">
-            {s.current.daysLeft} day{s.current.daysLeft === 1 ? '' : 's'} left in this {c.periodDays === 1 ? 'day' : c.periodDays === 7 ? 'week' : 'round'}
+            {timeLeftLabel(c.periodDays, s.current.daysLeft)}
             {s.streak > 1 ? ` · 🔥 ${s.streak}` : ''}
           </span>
         </span>

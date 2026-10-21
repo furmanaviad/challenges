@@ -46,3 +46,17 @@ export function chipsFor(target: number): number[] {
 export function fmt(n: number): string {
   return Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100)
 }
+
+/** "5 hours left today" on the last day of a period, otherwise "3 days left this week". */
+export function timeLeftLabel(periodDays: number, daysLeft: number, now: Date = new Date()): string {
+  if (daysLeft <= 1) {
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+    const mins = Math.max(0, Math.round((midnight.getTime() - now.getTime()) / 60000))
+    const when = periodDays === 1 ? 'today' : 'in this ' + (periodDays === 7 ? 'week' : 'round')
+    if (mins < 60) return `Less than 1 hour left ${when}`
+    const h = Math.round(mins / 60)
+    return `${h} hour${h === 1 ? '' : 's'} left ${when}`
+  }
+  const unit = periodDays === 7 ? 'this week' : 'in this round'
+  return `${daysLeft} days left ${unit}`
+}
